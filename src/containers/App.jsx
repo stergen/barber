@@ -2,7 +2,7 @@ import React from "react";
 import { Provider } from "react-redux";
 import { ConnectedRouter } from "connected-react-router";
 import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
-import Routes from "./Routes";
+import Main from "./Main";
 import store, { history } from "../store";
 
 class App extends React.PureComponent {
@@ -11,7 +11,14 @@ class App extends React.PureComponent {
 
     this.theme = createMuiTheme({
       palette: {
-        type: "dark"
+        primary: {
+          main: "#232323"
+        },
+        secondary: {
+          light: "#808080",
+          main: "#181818",
+          contrastText: "#ffffff"
+        }
       },
       typography: {
         useNextVariants: true
@@ -24,7 +31,7 @@ class App extends React.PureComponent {
       <Provider store={store}>
         <ConnectedRouter history={history}>
           <MuiThemeProvider theme={this.theme}>
-            <Routes />
+            <Main />
           </MuiThemeProvider>
         </ConnectedRouter>
       </Provider>
