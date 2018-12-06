@@ -11,13 +11,17 @@ class App extends React.PureComponent {
 
     this.theme = createMuiTheme({
       palette: {
+        type: "dark",
         primary: {
-          main: "#232323"
+          light: "#b1b1b1",
+          main: "#232323",
+          dark: "#000",
+          contrastText: "#fff"
         },
         secondary: {
           light: "#808080",
           main: "#181818",
-          contrastText: "#ffffff"
+          contrastText: "#fff"
         }
       },
       typography: {

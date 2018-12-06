@@ -7,13 +7,7 @@ function Banner() {
   return (
     <div className="banner">
       <div className="banner-content">
-        <Typography
-          component="h1"
-          variant="h2"
-          align="center"
-          color="inherit"
-          gutterBottom
-        >
+        <Typography component="h1" variant="h2" align="center" gutterBottom>
           Barber
         </Typography>
       </div>

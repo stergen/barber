@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
+import { Link } from "react-router-dom";
 import { withStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -19,17 +20,19 @@ const styles = {
 
 function Header({ classes }) {
   return (
-    <AppBar position="fixed">
+    <AppBar position="static">
       <Toolbar>
-        <IconButton
-          className={classes.menuButton}
-          color="inherit"
-          aria-label="Menu"
-        >
+        <IconButton className={classes.menuButton} aria-label="Menu">
           <MenuIcon />
         </IconButton>
-        <div className={classes.grow} />
-        <Button color="inherit">Login</Button>
+        <div className={classes.grow}>
+          <Button component={Link} to="">
+            Home
+          </Button>
+        </div>
+        <Button component={Link} to="login">
+          Login
+        </Button>
       </Toolbar>
     </AppBar>
   );
