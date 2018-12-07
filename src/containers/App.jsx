@@ -13,15 +13,13 @@ class App extends React.PureComponent {
       palette: {
         type: "dark",
         primary: {
-          light: "#b1b1b1",
-          main: "#232323",
-          dark: "#000",
+          light: "#949494",
+          main: "#383838",
+          dark: "#1d1d1d",
           contrastText: "#fff"
         },
         secondary: {
-          light: "#808080",
-          main: "#181818",
-          contrastText: "#fff"
+          main: "#E30501"
         }
       },
       typography: {
