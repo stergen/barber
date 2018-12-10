@@ -9,8 +9,8 @@ const userSchema = new mongoose.Schema(
       last: { type: String, max: 100, trim: true }
     },
     phone: { type: String, required: true, trim: true, unique: true },
-    email: { type: String, trim: true },
     password: { type: String, required: true },
+    email: { type: String, trim: true },
     services: [mongoose.Schema.Types.ObjectId]
   },
   options

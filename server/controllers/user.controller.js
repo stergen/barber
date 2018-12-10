@@ -5,13 +5,7 @@ const { secret } = require("../config/auth.config");
 
 // Create and save new user to the database
 module.exports.create = (req, res) => {
-  const { firstName, phone, password } = req.body;
-
-  if (!firstName || !phone || !password) {
-    return res.status(400).send({
-      message: "User should be have: firstName, phone and password"
-    });
-  }
+  if (!checkingUserData(req.body, res)) return;
 
   const user = new User({
     name: {
@@ -38,16 +32,15 @@ module.exports.create = (req, res) => {
   return user;
 };
 
-// Retrieve and return all employers from the database.
+// Retrieve and return all user from the database.
 module.exports.findAll = (req, res) => {
   User.find()
-    .then(employers => {
-      res.send(employers);
+    .then(user => {
+      res.send(user);
     })
     .catch(err => {
       res.status(500).send({
-        message:
-          err.message || "Some error occurred while retrieving employers."
+        message: err.message || "Some error occurred while retrieving users."
       });
     });
 };
@@ -58,7 +51,7 @@ module.exports.findOne = (req, res) => {
     .then(user => {
       if (!user) {
         return res.status(404).send({
-          message: `Note not found with id ${req.params.userId}`
+          message: `User not found with id ${req.params.userId}`
         });
       }
 
@@ -67,27 +60,30 @@ module.exports.findOne = (req, res) => {
     .catch(err => {
       if (err.kind === "ObjectId") {
         return res.status(404).send({
-          message: `Note not found with id ${req.params.userId}`
+          message: `User not found with id ${req.params.userId}`
         });
       }
 
       return res.status(500).send({
-        message: `Error retrieving note with id ${req.params.userId}`
+        message: `Error retrieving user with id ${req.params.userId}`
       });
     });
 };
 
 // Update a user identified by the userId in the request
 module.exports.update = (req, res) => {
+  if (!checkingUserData(req.body, res)) return;
+
   User.findOneAndUpdate(
     req.params.userId,
     {
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
-      nickname: req.body.nickname,
-      email: req.body.email,
+      name: {
+        first: req.body.firstName,
+        last: req.body.lastName
+      },
+      password: bcrypt.hashSync(req.body.password, 10),
       phone: req.body.phone,
-      password: req.body.password
+      email: req.body.email
     },
     { new: true }
   )
@@ -102,12 +98,12 @@ module.exports.update = (req, res) => {
     .catch(err => {
       if (err.kind === "ObjectId") {
         return res.status(404).send({
-          message: `Note not found with id ${req.params.userId}`
+          message: `User not found with id ${req.params.userId}`
         });
       }
 
       return res.status(500).send({
-        message: `Error updating note with id ${req.params.userId}`
+        message: `Error updating user with id ${req.params.userId}`
       });
     });
 };
@@ -169,3 +165,17 @@ module.exports.getUser = (req, res) => {
 
 module.exports.logout = (req, res) =>
   res.status(200).send({ auth: false, token: null });
+
+function checkingUserData(body, res) {
+  const { firstName, phone, password } = body;
+
+  if (!firstName || !phone || !password) {
+    res.status(400).send({
+      message: "User should be have: firstName, phone and password"
+    });
+
+    return false;
+  }
+
+  return true;
+}
