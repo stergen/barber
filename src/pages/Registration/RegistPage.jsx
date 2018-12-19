@@ -1,5 +1,5 @@
 import React from "react";
-import axios from "axios";
+// import axios from "axios";
 import PropTypes from "prop-types";
 
 import Avatar from "@material-ui/core/Avatar";
@@ -14,6 +14,8 @@ import LockIcon from "@material-ui/icons/LockOutlined";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import withStyles from "@material-ui/core/styles/withStyles";
+
+import User from "../../API/User";
 
 const styles = theme => ({
   main: {
@@ -98,12 +100,7 @@ class RegistUser extends React.Component {
     if (password !== confirmPassword && confirmPassword.length < 6) {
       alert("bad pass");
     } else {
-      axios
-        .post("http://localhost:8080/users", {
-          firstName,
-          phone,
-          password
-        })
+      User.create(firstName, phone, password)
         .then(res => {
           console.log("all is good", res);
         })
@@ -111,7 +108,7 @@ class RegistUser extends React.Component {
           alert("bad(", err);
         });
     }
-  }
+  };
 
   render() {
     const { firstName, phone, password, confirmPassword } = this.state;
@@ -125,10 +122,7 @@ class RegistUser extends React.Component {
           <Typography component="h1" variant="h5">
             Sign in
           </Typography>
-          <form
-            className={this.form}
-            onSubmit={this.handleSubmit}
-          >
+          <form className={this.form} onSubmit={this.handleSubmit}>
             <FormControl margin="normal" required fullWidth>
               <InputLabel htmlFor="name">Name</InputLabel>
               <Input
