@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
+import { Link } from "react-router-dom";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -85,6 +86,17 @@ function SignIn(props) {
             className={classes.submit}
           >
             Sign in
+          </Button>
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            color="primary"
+            className={classes.submit}
+            component={Link}
+            to="Registration"
+          >
+            Sign up
           </Button>
         </form>
       </Paper>
