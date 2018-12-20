@@ -16,6 +16,8 @@ nodemon app.js
 npm run start
 ```
 
+## [API documentation](./doc/api/index.html)
+
 You need Visual studio code to be configured with next extensions
 
 ``

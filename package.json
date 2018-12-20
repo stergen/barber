@@ -26,7 +26,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "doc": "apidoc -i ./server/ -o doc/api/"
   },
   "browserslist": [
     ">0.2%",
@@ -35,6 +36,7 @@
     "not op_mini all"
   ],
   "devDependencies": {
+    "apidoc": "^0.17.7",
     "eslint-config-airbnb": "^17.1.0",
     "eslint-config-prettier": "^3.3.0",
     "eslint-plugin-import": "^2.14.0",
@@ -43,5 +45,12 @@
     "eslint-plugin-prettier": "^3.0.0",
     "eslint-plugin-react": "^7.11.1",
     "prettier": "^1.15.3"
+  },
+  "apidoc": {
+    "name": "Barber",
+    "version": "0.1.0",
+    "description": "Api documentation",
+    "title": "API barber",
+    "url" : "http://localhost:8080"
   }
 }

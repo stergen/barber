@@ -3,7 +3,6 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user.model");
 const { secret } = require("../config/auth.config");
 
-// Create and save new user to the database
 module.exports.create = (req, res) => {
   const { firstName, phone, password } = req.body;
 
@@ -52,7 +51,17 @@ module.exports.findAll = (req, res) => {
     });
 };
 
-// Find a single user with a userId
+/**
+ * @api {get} /user/:id Request User information
+ * @apiName GetUser
+ * @apiGroup User
+ *
+ * @apiParam {Number} id Users unique ID.
+ *
+ * @apiSuccess {Object} name        user full name.
+ * @apiSuccess {String} name.first  Firstname of the User.
+ * @apiSuccess {String} name.last   Lastname of the User.
+ */
 module.exports.findOne = (req, res) => {
   User.findById(req.params.userId)
     .then(user => {
