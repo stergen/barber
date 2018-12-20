@@ -3,6 +3,18 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/user.model");
 const { secret } = require("../config/auth.config");
 
+/**
+ * @api {post} /users Create user
+ * @apiName CreateUser
+ * @apiGroup Users
+ *
+ * @apiParam {String} firstName User firstname.
+ * @apiParam {String} phone User phone number.
+ * @apiParam {String} password User password.
+ *
+ * @apiSuccess {Bool} auth
+ * @apiSuccess {String} token User token.
+ */
 module.exports.create = (req, res) => {
   const { firstName, phone, password } = req.body;
 
@@ -37,7 +49,18 @@ module.exports.create = (req, res) => {
   return user;
 };
 
-// Retrieve and return all employers from the database.
+/**
+ * @api {get} /users Get all Users
+ * @apiName GetUsers
+ * @apiGroup Users
+ *
+ * @apiSuccess {Object[]} users           List of Users.
+ * @apiSuccess {Object} users.name        User full name.
+ * @apiSuccess {String} users.name.first  Firstname of the User
+ * @apiSuccess {String} users.name.last   Lastname of the User
+ * @apiSuccess {String} users.phone       Phone of the User
+ * @apiSuccess {String} users.password    Password of the User
+ */
 module.exports.findAll = (req, res) => {
   User.find()
     .then(employers => {
@@ -52,15 +75,17 @@ module.exports.findAll = (req, res) => {
 };
 
 /**
- * @api {get} /user/:id Request User information
+ * @api {get} /users/:id Get User information
  * @apiName GetUser
- * @apiGroup User
+ * @apiGroup Users
  *
  * @apiParam {Number} id Users unique ID.
  *
- * @apiSuccess {Object} name        user full name.
- * @apiSuccess {String} name.first  Firstname of the User.
- * @apiSuccess {String} name.last   Lastname of the User.
+ * @apiSuccess {Object} name            User full name.
+ * @apiSuccess {String} name.first      Firstname of the User.
+ * @apiSuccess {String} name.last       Lastname of the User.
+ * @apiSuccess {String} users.phone     Phone of the User
+ * @apiSuccess {String} users.password  Password of the User
  */
 module.exports.findOne = (req, res) => {
   User.findById(req.params.userId)
@@ -86,15 +111,28 @@ module.exports.findOne = (req, res) => {
     });
 };
 
-// Update a user identified by the userId in the request
+/**
+ * @api {put} /users/:id Update user information
+ * @apiName UpdateUser
+ * @apiGroup Users
+ *
+ * @apiParam {Number} id Users unique ID.
+ *
+ * @apiParam {String} firstName         User firstname.
+ * @apiParam {String} lastName          User lastname.
+ * @apiParam {String} phone             User phone number.
+ * @apiParam {String} password          User password.
+ *
+ * @apiSuccess {String} message         Information
+ */
 module.exports.update = (req, res) => {
   User.findOneAndUpdate(
     req.params.userId,
     {
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
-      nickname: req.body.nickname,
-      email: req.body.email,
+      name: {
+        first: req.body.firstName,
+        last: req.body.lastName
+      },
       phone: req.body.phone,
       password: req.body.password
     },
@@ -106,7 +144,9 @@ module.exports.update = (req, res) => {
           message: `User not found with id ${req.params.userId}`
         });
       }
-      res.send(user);
+      res.status(200).send({
+        message: `User ${req.params.userId} updated`
+      });
     })
     .catch(err => {
       if (err.kind === "ObjectId") {
@@ -121,7 +161,15 @@ module.exports.update = (req, res) => {
     });
 };
 
-// Delete a user with the specified userId in the request
+/**
+ * @api {delete} /users/:id Delete User information
+ * @apiName DeleteUser
+ * @apiGroup Users
+ *
+ * @apiParam {Number} id Users unique ID.
+ *
+ * @apiSuccess {String} message Information
+ */
 module.exports.delete = (req, res) => {
   User.findById(req.params.userId)
     .then(user => {
