@@ -1,5 +1,10 @@
 const mongoose = require("mongoose");
 
+if (process.env.NODE_ENV === "test") {
+  mongoose.models = {};
+  mongoose.modelSchemas = {};
+}
+
 const options = { discriminatorKey: "kind" };
 
 const userSchema = new mongoose.Schema(
@@ -16,6 +21,4 @@ const userSchema = new mongoose.Schema(
   options
 );
 
-const User = mongoose.model("User", userSchema);
-
-module.exports = User;
+module.exports = mongoose.model("User", userSchema);
