@@ -1,7 +1,23 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const Joi = require("joi");
 const User = require("../models/user.model");
 const { secret } = require("../config/auth.config");
+
+const userSchema = Joi.object().keys({
+  firstName: Joi.string()
+    .regex(/^[a-zA-Zа-яА-Я]{3,30}$/)
+    .min(2)
+    .required(),
+  lastName: Joi.string()
+    .regex(/^[a-zA-Zа-яА-Я]{3,30}$/)
+    .min(2),
+  password: Joi.string()
+    .regex(/^[a-zA-Z0-9]{3,30}$/)
+    .required(),
+  phone: Joi.string().required(),
+  email: Joi.string().email({ minDomainAtoms: 2 })
+});
 
 // Create and save new user to the database
 module.exports.create = (req, res) => {
@@ -19,13 +35,13 @@ module.exports.create = (req, res) => {
     .save()
     .then(data => {
       const token = jwt.sign({ id: data._id }, secret, {
-        expiresIn: 86400 // expires in 24 hours
+        expiresIn: 86400
       });
       res.status(200).send({ auth: true, token });
     })
     .catch(err => {
       res.status(500).send({
-        message: err.message || "Some error occurred while creating the User."
+        message: err.message
       });
     });
 
@@ -40,7 +56,7 @@ module.exports.findAll = (req, res) => {
     })
     .catch(err => {
       res.status(500).send({
-        message: err.message || "Some error occurred while retrieving users."
+        message: err.message
       });
     });
 };
@@ -137,6 +153,7 @@ module.exports.delete = (req, res) => {
     });
 };
 
+// Get user data by of token
 module.exports.getUser = (req, res) => {
   const token = req.headers["x-access-token"];
 
@@ -167,15 +184,13 @@ module.exports.logout = (req, res) =>
   res.status(200).send({ auth: false, token: null });
 
 function checkingUserData(body, res) {
-  const { firstName, phone, password } = body;
+  const result = Joi.validate(body, userSchema, { abortEarly: false });
 
-  if (!firstName || !phone || !password) {
-    res.status(400).send({
-      message: "User should be have: firstName, phone and password"
-    });
+  if (result.error === null) return true;
 
-    return false;
-  }
+  res.status(400).send({
+    message: result.error.toString()
+  });
 
-  return true;
+  return false;
 }
