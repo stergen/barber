@@ -24,6 +24,13 @@
       "enforceForRenamedProperties": false
     }]
   },
+  "overrides": [{
+    "files": "**/*.test.js",
+    "rules": {
+        "node/no-unpublished-require": 0,
+        "node/no-missing-require": 0
+    }
+  }],
   "env": {
     "browser": true,
     "jest": true
