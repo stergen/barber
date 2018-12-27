@@ -1,17 +1,27 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const Joi = require("joi");
 const User = require("../models/user.model");
 const { secret } = require("../config/auth.config");
 
+const userSchema = Joi.object().keys({
+  firstName: Joi.string()
+    .regex(/^[a-zA-Zа-яА-Я]{3,30}$/)
+    .min(2)
+    .required(),
+  lastName: Joi.string()
+    .regex(/^[a-zA-Zа-яА-Я]{3,30}$/)
+    .min(2),
+  password: Joi.string()
+    .regex(/^[a-zA-Z0-9]{3,30}$/)
+    .required(),
+  phone: Joi.string().required(),
+  email: Joi.string().email({ minDomainAtoms: 2 })
+});
+
 // Create and save new user to the database
 module.exports.create = (req, res) => {
-  const { firstName, phone, password } = req.body;
-
-  if (!firstName || !phone || !password) {
-    return res.status(400).send({
-      message: "User should be have: firstName, phone and password"
-    });
-  }
+  if (!checkingUserData(req.body, res)) return;
 
   const user = new User({
     name: {
@@ -25,29 +35,28 @@ module.exports.create = (req, res) => {
     .save()
     .then(data => {
       const token = jwt.sign({ id: data._id }, secret, {
-        expiresIn: 86400 // expires in 24 hours
+        expiresIn: 86400
       });
       res.status(200).send({ auth: true, token });
     })
     .catch(err => {
       res.status(500).send({
-        message: err.message || "Some error occurred while creating the User."
+        message: err.message
       });
     });
 
   return user;
 };
 
-// Retrieve and return all employers from the database.
+// Retrieve and return all user from the database.
 module.exports.findAll = (req, res) => {
   User.find()
-    .then(employers => {
-      res.send(employers);
+    .then(user => {
+      res.send(user);
     })
     .catch(err => {
       res.status(500).send({
-        message:
-          err.message || "Some error occurred while retrieving employers."
+        message: err.message
       });
     });
 };
@@ -58,7 +67,7 @@ module.exports.findOne = (req, res) => {
     .then(user => {
       if (!user) {
         return res.status(404).send({
-          message: `Note not found with id ${req.params.userId}`
+          message: `User not found with id ${req.params.userId}`
         });
       }
 
@@ -67,27 +76,30 @@ module.exports.findOne = (req, res) => {
     .catch(err => {
       if (err.kind === "ObjectId") {
         return res.status(404).send({
-          message: `Note not found with id ${req.params.userId}`
+          message: `User not found with id ${req.params.userId}`
         });
       }
 
       return res.status(500).send({
-        message: `Error retrieving note with id ${req.params.userId}`
+        message: `Error retrieving user with id ${req.params.userId}`
       });
     });
 };
 
 // Update a user identified by the userId in the request
 module.exports.update = (req, res) => {
+  if (!checkingUserData(req.body, res)) return;
+
   User.findOneAndUpdate(
     req.params.userId,
     {
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
-      nickname: req.body.nickname,
-      email: req.body.email,
+      name: {
+        first: req.body.firstName,
+        last: req.body.lastName
+      },
+      password: bcrypt.hashSync(req.body.password, 10),
       phone: req.body.phone,
-      password: req.body.password
+      email: req.body.email
     },
     { new: true }
   )
@@ -102,12 +114,12 @@ module.exports.update = (req, res) => {
     .catch(err => {
       if (err.kind === "ObjectId") {
         return res.status(404).send({
-          message: `Note not found with id ${req.params.userId}`
+          message: `User not found with id ${req.params.userId}`
         });
       }
 
       return res.status(500).send({
-        message: `Error updating note with id ${req.params.userId}`
+        message: `Error updating user with id ${req.params.userId}`
       });
     });
 };
@@ -141,6 +153,7 @@ module.exports.delete = (req, res) => {
     });
 };
 
+// Get user data by of token
 module.exports.getUser = (req, res) => {
   const token = req.headers["x-access-token"];
 
@@ -169,3 +182,15 @@ module.exports.getUser = (req, res) => {
 
 module.exports.logout = (req, res) =>
   res.status(200).send({ auth: false, token: null });
+
+function checkingUserData(body, res) {
+  const result = Joi.validate(body, userSchema, { abortEarly: false });
+
+  if (result.error === null) return true;
+
+  res.status(400).send({
+    message: result.error.toString()
+  });
+
+  return false;
+}
