@@ -19,7 +19,24 @@ const userSchema = Joi.object().keys({
   email: Joi.string().email({ minDomainAtoms: 2 })
 });
 
-// Create and save new user to the database
+/**
+ * @api {post} /users Create user
+ * @apiName CreateUser
+ * @apiGroup Users
+ *
+ * @apiParam {String} firstName User firstname.
+ * @apiParam {String} phone User phone number.
+ * @apiParam {String} password User password.
+ *
+ * @apiSuccess {Bool} auth
+ * @apiSuccess {String} token User token.
+ *
+ * @apiError (Error 400) {String} message Contain information
+ * why the server can't process your request
+ *
+ * @apiError (Error 500) {String} message Contain information
+ * why the server can't create User
+ */
 module.exports.create = (req, res) => {
   if (!checkingUserData(req.body, res)) return;
 
@@ -48,7 +65,21 @@ module.exports.create = (req, res) => {
   return user;
 };
 
-// Retrieve and return all user from the database.
+/**
+ * @api {get} /users Get all Users
+ * @apiName GetUsers
+ * @apiGroup Users
+ *
+ * @apiSuccess {Object[]} users           List of Users.
+ * @apiSuccess {Object} users.name        User full name.
+ * @apiSuccess {String} users.name.first  Firstname of the User
+ * @apiSuccess {String} users.name.last   Lastname of the User
+ * @apiSuccess {String} users.phone       Phone of the User
+ * @apiSuccess {String} users.password    Password of the User
+ *
+ * @apiError (Error 500) {String} message Contain information
+ * why the server can't return Users
+ */
 module.exports.findAll = (req, res) => {
   User.find()
     .then(user => {
@@ -61,7 +92,23 @@ module.exports.findAll = (req, res) => {
     });
 };
 
-// Find a single user with a userId
+/**
+ * @api {get} /users/:id Get User information
+ * @apiName GetUser
+ * @apiGroup Users
+ *
+ * @apiParam {Number} id Users unique ID.
+ *
+ * @apiSuccess {Object} name            User full name.
+ * @apiSuccess {String} name.first      Firstname of the User.
+ * @apiSuccess {String} name.last       Lastname of the User.
+ * @apiSuccess {String} users.phone     Phone of the User
+ * @apiSuccess {String} users.password  Password of the User
+ *
+ * @apiError (Error 404) {String} message Can't find User with <code>id</code>
+ * @apiError (Error 500) {String} message Contain information
+ * why the server can't return User
+ */
 module.exports.findOne = (req, res) => {
   User.findById(req.params.userId)
     .then(user => {
@@ -86,7 +133,24 @@ module.exports.findOne = (req, res) => {
     });
 };
 
-// Update a user identified by the userId in the request
+/**
+ * @api {put} /users/:id Update user information
+ * @apiName UpdateUser
+ * @apiGroup Users
+ *
+ * @apiParam {Number} id Users unique ID.
+ *
+ * @apiParam {String} firstName         User firstname.
+ * @apiParam {String} lastName          User lastname.
+ * @apiParam {String} phone             User phone number.
+ * @apiParam {String} password          User password.
+ *
+ * @apiSuccess {String} message         Information
+ *
+ * @apiError (Error 404) {String} message Can't find User with <code>id</code>
+ * @apiError (Error 500) {String} message Contain information
+ * why the server can't update User
+ */
 module.exports.update = (req, res) => {
   if (!checkingUserData(req.body, res)) return;
 
@@ -109,7 +173,9 @@ module.exports.update = (req, res) => {
           message: `User not found with id ${req.params.userId}`
         });
       }
-      res.send(user);
+      res.status(200).send({
+        message: `User ${req.params.userId} updated`
+      });
     })
     .catch(err => {
       if (err.kind === "ObjectId") {
@@ -119,12 +185,24 @@ module.exports.update = (req, res) => {
       }
 
       return res.status(500).send({
-        message: `Error updating user with id ${req.params.userId}`
+        message: `Error updating User with id ${req.params.userId}`
       });
     });
 };
 
-// Delete a user with the specified userId in the request
+/**
+ * @api {delete} /users/:id Delete User information
+ * @apiName DeleteUser
+ * @apiGroup Users
+ *
+ * @apiParam {Number} id Users unique ID.
+ *
+ * @apiSuccess {String} message Information
+ *
+ * @apiError (Error 404) {String} message Can't find User with <code>id</code>
+ * @apiError (Error 500) {String} message Contain information
+ * why the server can't delete User
+ */
 module.exports.delete = (req, res) => {
   User.findById(req.params.userId)
     .then(user => {
@@ -143,7 +221,7 @@ module.exports.delete = (req, res) => {
     .catch(err => {
       if (err.kind === "ObjectId") {
         return res.status(404).send({
-          message: `Note not found with id ${req.params.userId}`
+          message: `User not found with id ${req.params.userId}`
         });
       }
 
@@ -153,7 +231,23 @@ module.exports.delete = (req, res) => {
     });
 };
 
-// Get user data by of token
+/**
+ * @api {get} /users/me Get current User information
+ * @apiName GetCurrentUser
+ * @apiGroup Users
+ *
+ * @apiSuccess {Object} name            User full name.
+ * @apiSuccess {String} name.first      Firstname of the User.
+ * @apiSuccess {String} name.last       Lastname of the User.
+ * @apiSuccess {String} users.phone     Phone of the User.
+ * @apiSuccess {String} users.password  Password of the User.
+ *
+ * @apiError (Error 401) {String} message Can't get
+ * <code>token</code> check your <code>x-access-token</code>.
+ * @apiError (Error 404) {String} message Can't find User
+ * @apiError (Error 500) {String} message Contain information
+ * why the server can't authenticate token.
+ */
 module.exports.getUser = (req, res) => {
   const token = req.headers["x-access-token"];
 
@@ -180,6 +274,14 @@ module.exports.getUser = (req, res) => {
   });
 };
 
+/**
+ * @api {get} /users/logout Logout User
+ * @apiName LogoutUser
+ * @apiGroup Users
+ *
+ * @apiSuccess {Bool} auth will return false
+ * @apiSuccess {String} token will return null
+ */
 module.exports.logout = (req, res) =>
   res.status(200).send({ auth: false, token: null });
 
