@@ -47,6 +47,16 @@ const styles = theme => ({
   }
 });
 
+class LoginPage extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      phone: "",
+      password: ""
+    };
+  }
+}
+
 function SignIn(props) {
   const { classes } = props;
 
@@ -97,6 +107,17 @@ function SignIn(props) {
             to="Registration"
           >
             Sign up
+          </Button>
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            color="primary"
+            className={classes.submit}
+            component={Link}
+            to="profile"
+          >
+            Test_Button_user_page
           </Button>
         </form>
       </Paper>

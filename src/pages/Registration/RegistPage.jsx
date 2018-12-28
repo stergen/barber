@@ -111,18 +111,19 @@ class RegistUser extends React.Component {
   };
 
   render() {
+    const { classes } = this.props;
     const { firstName, phone, password, confirmPassword } = this.state;
     return (
-      <main className={this.main}>
+      <main className={classes.main}>
         <CssBaseline />
-        <Paper className={this.paper}>
-          <Avatar className={this.avatar}>
+        <Paper className={classes.paper}>
+          <Avatar className={classes.avatar}>
             <LockIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
             Sign in
           </Typography>
-          <form className={this.form} onSubmit={this.handleSubmit}>
+          <form className={classes.form} onSubmit={this.handleSubmit}>
             <FormControl margin="normal" required fullWidth>
               <InputLabel htmlFor="name">Name</InputLabel>
               <Input
@@ -173,7 +174,7 @@ class RegistUser extends React.Component {
               fullWidth
               variant="contained"
               color="primary"
-              className={this.submit}
+              className={classes.submit}
             >
               Submit
             </Button>

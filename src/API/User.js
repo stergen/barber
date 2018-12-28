@@ -7,6 +7,8 @@ class User {
       phone,
       password
     });
+
+  static get = () => Http.get(`${process.env.REACT_APP_API_URL}/users`, {});
 }
 
 export default User;
