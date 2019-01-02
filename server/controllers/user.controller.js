@@ -38,7 +38,7 @@ const userSchema = Joi.object().keys({
  * why the server can't create User
  */
 module.exports.create = (req, res) => {
-  if (!checkingUserData(req.body, res)) return;
+  checkingUserData(req.body, res, userSchema);
 
   const user = new User({
     name: {
@@ -54,7 +54,7 @@ module.exports.create = (req, res) => {
       const token = jwt.sign({ id: data._id }, secret, {
         expiresIn: 86400
       });
-      res.status(200).send({ auth: true, token });
+      res.status(200).send({ user, auth: true, token });
     })
     .catch(err => {
       res.status(500).send({
@@ -152,7 +152,7 @@ module.exports.findOne = (req, res) => {
  * why the server can't update User
  */
 module.exports.update = (req, res) => {
-  if (!checkingUserData(req.body, res)) return;
+  checkingUserData(req.body, res, userSchema);
 
   User.findOneAndUpdate(
     req.params.userId,
@@ -275,6 +275,52 @@ module.exports.getUser = (req, res) => {
 };
 
 /**
+ * @api {post} /users/login Login User
+ * @apiName LoginUser
+ * @apiGroup Users
+ *
+ * @apiParam {String} phone User phone number.
+ * @apiParam {String} password User password.
+ *
+ * @apiSuccess {Bool} auth
+ * @apiSuccess {String} token User token.
+ * @apiSuccess {Object} user              List of Users.
+ * @apiSuccess {Object} user.name         User full name.
+ * @apiSuccess {String} user.name.first   Firstname of the User
+ * @apiSuccess {String} user.name.last    Lastname of the User
+ * @apiSuccess {String} user.phone        Phone of the User
+ * @apiSuccess {String} user.password     Password of the User
+ *
+ * @apiError (Error 400) {String} message Contain information
+ * why the server can't process your request
+ *
+ * @apiError (Error 500) {String} message Contain information
+ * why the server can't create User
+ */
+module.exports.login = (req, res) => {
+  checkingUserData(req.body, res, userSchema.optionalKeys("firstName"));
+
+  User.find({ phone: req.body.phone })
+    .then(user => {
+      const token = jwt.sign({ id: user._id }, secret, {
+        expiresIn: 86400
+      });
+      res.status(200).send({ user, auth: true, token });
+    })
+    .catch(err => {
+      if (err.kind === "ObjectId") {
+        return res.status(404).send({
+          message: `User not found with phone ${req.body.phone}`
+        });
+      }
+
+      return res.status(500).send({
+        message: `Error retrieving user with phone ${req.body.phone}`
+      });
+    });
+};
+
+/**
  * @api {get} /users/logout Logout User
  * @apiName LogoutUser
  * @apiGroup Users
@@ -285,7 +331,7 @@ module.exports.getUser = (req, res) => {
 module.exports.logout = (req, res) =>
   res.status(200).send({ auth: false, token: null });
 
-function checkingUserData(body, res) {
+function checkingUserData(body, res, userSchema) {
   const result = Joi.validate(body, userSchema, { abortEarly: false });
 
   if (result.error === null) return true;
@@ -293,6 +339,4 @@ function checkingUserData(body, res) {
   res.status(400).send({
     message: result.error.toString()
   });
-
-  return false;
 }

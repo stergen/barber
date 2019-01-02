@@ -90,6 +90,7 @@ describe("Users", () => {
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a("object");
+          res.body.should.have.property("user");
           res.body.should.have.property("auth");
           res.body.should.have.property("auth").eql(true);
           done();
@@ -110,6 +111,34 @@ describe("Users", () => {
           res.should.have.status(400);
           res.body.should.be.a("object");
           res.body.should.have.property("message");
+          done();
+        });
+    });
+
+    it("it should POST user login data", done => {
+      const newUser = new User({
+        name: {
+          first: user.firstName
+        },
+        password: user.password,
+        phone: user.phone
+      });
+
+      newUser.save();
+
+      chai
+        .request(server)
+        .post("/users/login")
+        .send({
+          phone: user.phone,
+          password: user.password
+        })
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.a("object");
+          res.body.should.have.property("user");
+          res.body.should.have.property("auth");
+          res.body.should.have.property("auth").eql(true);
           done();
         });
     });
