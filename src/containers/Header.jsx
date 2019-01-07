@@ -1,5 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
+
+import { connect } from "react-redux";
+
 import { Link } from "react-router-dom";
 import { withStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
@@ -8,6 +11,8 @@ import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
 import MenuIcon from "@material-ui/icons/Menu";
 import InputIcon from "@material-ui/icons/Input";
+
+import * as selectors from "../selectors/user";
 
 const styles = theme => ({
   grow: {
@@ -49,6 +54,12 @@ class Header extends React.Component {
       className = classes.transparentAppBar;
     }
 
+    const { firstName } = this.props.user;
+    let showButton = false;
+    if (firstName.length > 0) {
+      showButton = true;
+    }
+
     return (
       <AppBar position={position} className={className}>
         <Toolbar>
@@ -56,9 +67,11 @@ class Header extends React.Component {
             <MenuIcon />
           </IconButton>
           <div className={classes.grow}>
-            <Button component={Link} to="">
-              Home
-            </Button>
+            {!showButton && (
+              <Button component={Link} to="">
+                Home
+              </Button>
+            )}
           </div>
           <IconButton
             className={classes.inputButton}
@@ -82,4 +95,8 @@ Header.contextTypes = {
   router: PropTypes.shape({})
 };
 
-export default withStyles(styles)(Header);
+const mapStateToProps = state => ({
+  user: selectors.getUser(state)
+});
+
+export default withStyles(styles)(connect(mapStateToProps)(Header));

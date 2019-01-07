@@ -1,9 +1,11 @@
 const express = require("express");
-const cors = require("cors");
 const bodyParser = require("body-parser");
 
 // create express app
+const cors = require("cors");
+
 const app = express();
+
 app.use(cors());
 
 // parse requests of content-type - application/x-www-form-urlencoded
@@ -21,10 +23,15 @@ app.get("/", (req, res) => {
 });
 
 const port = 8080;
-// listen for requests
-app.listen(port, () => {
-  console.log(`Server is listening on port ${port}`);
-});
+
+if (!module.parent) {
+  // listen for requests
+  app.listen(port, () => {
+    console.log(`Server is listening on port ${port}`);
+  });
+}
 
 // Require Notes routes
 require("./server/routes/user.js")(app);
+
+module.exports = app; // for testing

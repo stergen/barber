@@ -9,7 +9,7 @@
     "node/prefer-global/process": ["error", "always"],
     "node/prefer-global/url-search-params": ["error", "always"],
     "node/prefer-global/url": ["error", "always"],
-
+    "max-len": ["error", { "code": 80 }],
     "prettier/prettier": "error",
     "prefer-destructuring": ["error", {
       "VariableDeclarator": {
@@ -24,6 +24,13 @@
       "enforceForRenamedProperties": false
     }]
   },
+  "overrides": [{
+    "files": "**/*.test.js",
+    "rules": {
+        "node/no-unpublished-require": 0,
+        "node/no-missing-require": 0
+    }
+  }],
   "env": {
     "browser": true,
     "jest": true
