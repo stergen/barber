@@ -16,11 +16,6 @@ nodemon app.js
 npm run start
 ```
 
-## API documentation
-You can check all API call on page `./doc/api/index.html`
-
-## What do you need:
-
 You need Visual studio code to be configured with next extensions
 
 ``
