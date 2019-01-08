@@ -9,6 +9,12 @@ class User {
     });
 
   static get = () => Http.get(`${process.env.REACT_APP_API_URL}/users`, {});
+
+  static logIn = (phone, password) =>
+    Http.post(`${process.env.REACT_APP_API_URL}/users/login`, {
+      phone,
+      password
+    });
 }
 
 export default User;
